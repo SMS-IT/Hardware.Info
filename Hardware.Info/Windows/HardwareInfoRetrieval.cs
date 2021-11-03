@@ -36,6 +36,11 @@ namespace Hardware.Info.Windows
 
         private readonly MemoryStatus _memoryStatus = new MemoryStatus();
 
+        /// <summary>
+        /// Locale identifier for getting settings, default EN - «MS_409».
+        /// </summary>
+        private static string _scopeOptionsLocale = "MS_409";
+
         public bool UseAsteriskInWMI { get; set; }
 
         private readonly string _managementScope = "root\\cimv2";
@@ -113,6 +118,7 @@ namespace Hardware.Info.Windows
         {
             using (var searcher = new ManagementObjectSearcher(new SelectQuery("Win32_OperatingSystem")))
             {
+                searcher.Scope.Options.Locale = _scopeOptionsLocale;
                 var os = searcher.Get().Cast<ManagementObject>().FirstOrDefault();
                 var properties = os?.Properties.Cast<PropertyData>().ToArray();
 
@@ -153,6 +159,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT FullChargeCapacity, DesignCapacity, BatteryStatus, EstimatedChargeRemaining, EstimatedRunTime, ExpectedLife, MaxRechargeTime, TimeOnBattery, TimeToFullCharge FROM Win32_Battery";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Battery battery = new Battery
@@ -182,6 +189,8 @@ namespace Hardware.Info.Windows
                                                   : "SELECT Caption, Description, Manufacturer, Name, ReleaseDate, SerialNumber, SoftwareElementID, Version FROM Win32_BIOS";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
+            
             foreach (ManagementObject mo in mos.Get())
             {
                 BIOS bios = new BIOS
@@ -216,6 +225,7 @@ namespace Hardware.Info.Windows
                                                       : "SELECT Name, PercentProcessorTime FROM Win32_PerfFormattedData_PerfOS_Processor WHERE Name != '_Total'";
                 using ManagementObjectSearcher percentProcessorTimeMOS = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+                percentProcessorTimeMOS.Scope.Options.Locale = _scopeOptionsLocale;
                 foreach (ManagementObject mo in percentProcessorTimeMOS.Get())
                 {
                     CpuCore core = new CpuCore
@@ -231,6 +241,7 @@ namespace Hardware.Info.Windows
                                                       : "SELECT PercentProcessorTime FROM Win32_PerfFormattedData_PerfOS_Processor WHERE Name = '_Total'";
                 using ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(_managementScope, QueryString, _enumerationOptions);
 
+                managementObjectSearcher.Scope.Options.Locale = _scopeOptionsLocale;
                 foreach (ManagementObject mo in managementObjectSearcher.Get())
                 {
                     percentProcessorTime = GetPropertyValue<ulong>(mo["PercentProcessorTime"]);
@@ -244,6 +255,7 @@ namespace Hardware.Info.Windows
                                                             : "SELECT Caption, CurrentClockSpeed, Description, L2CacheSize, L3CacheSize, Manufacturer, MaxClockSpeed, Name, NumberOfCores, NumberOfLogicalProcessors, ProcessorId, SocketDesignation FROM Win32_Processor";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, query, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 CPU cpu = new CPU
@@ -284,6 +296,8 @@ namespace Hardware.Info.Windows
             string queryString = UseAsteriskInWMI ? "SELECT * FROM Win32_DiskDrive"
                                                   : "SELECT Caption, Description, DeviceID, FirmwareRevision, Index, Manufacturer, Model, Name, Partitions, SerialNumber, Size FROM Win32_DiskDrive";
             using ManagementObjectSearcher Win32_DiskDrive = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
+
+            Win32_DiskDrive.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject DiskDrive in Win32_DiskDrive.Get())
             {
                 Drive drive = new Drive
@@ -302,6 +316,8 @@ namespace Hardware.Info.Windows
 
                 string queryString1 = "ASSOCIATORS OF {Win32_DiskDrive.DeviceID='" + DiskDrive["DeviceID"] + "'} WHERE AssocClass = Win32_DiskDriveToDiskPartition";
                 using ManagementObjectSearcher Win32_DiskPartition = new ManagementObjectSearcher(_managementScope, queryString1, _enumerationOptions);
+
+                Win32_DiskPartition.Scope.Options.Locale = _scopeOptionsLocale;
                 foreach (ManagementObject DiskPartition in Win32_DiskPartition.Get())
                 {
                     Partition partition = new Partition
@@ -320,6 +336,8 @@ namespace Hardware.Info.Windows
 
                     string queryString2 = "ASSOCIATORS OF {Win32_DiskPartition.DeviceID='" + DiskPartition["DeviceID"] + "'} WHERE AssocClass = Win32_LogicalDiskToPartition";
                     using ManagementObjectSearcher Win32_LogicalDisk = new ManagementObjectSearcher(_managementScope, queryString2, _enumerationOptions);
+
+                    Win32_LogicalDisk.Scope.Options.Locale = _scopeOptionsLocale;
                     foreach (ManagementObject LogicalDisk in Win32_LogicalDisk.Get())
                     {
                         Volume volume = new Volume
@@ -355,6 +373,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT Caption, Description, Name, NumberOfFunctionKeys FROM Win32_Keyboard";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Keyboard keyboard = new Keyboard
@@ -380,6 +399,7 @@ namespace Hardware.Info.Windows
                                                                             : "SELECT BankLabel, Capacity, FormFactor, Manufacturer, PartNumber, SerialNumber, Speed FROM Win32_PhysicalMemory";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Memory memory = new Memory
@@ -413,6 +433,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT Caption, Description, MonitorManufacturer, MonitorType, Name, PixelsPerXLogicalInch, PixelsPerYLogicalInch FROM Win32_DesktopMonitor WHERE PNPDeviceID IS NOT NULL";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Monitor monitor = new Monitor
@@ -440,6 +461,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT Manufacturer, Product, SerialNumber FROM Win32_BaseBoard";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Motherboard motherboard = new Motherboard
@@ -463,6 +485,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT Caption, Description, Manufacturer, Name, NumberOfButtons FROM Win32_PointingDevice";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Mouse mouse = new Mouse
@@ -488,6 +511,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT AdapterType, Caption, Description, DeviceID, MACAddress, Manufacturer, Name, NetConnectionID, ProductName, Speed FROM Win32_NetworkAdapter WHERE PhysicalAdapter=True AND MACAddress IS NOT NULL";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 NetworkAdapter networkAdapter = new NetworkAdapter
@@ -508,6 +532,8 @@ namespace Hardware.Info.Windows
                     string query = UseAsteriskInWMI ? $"SELECT * FROM Win32_PerfFormattedData_Tcpip_NetworkAdapter WHERE Name = '{networkAdapter.Name.Replace("(", "[").Replace(")", "]")}'"
                                                     : $"SELECT BytesSentPersec, BytesReceivedPersec FROM Win32_PerfFormattedData_Tcpip_NetworkAdapter WHERE Name = '{networkAdapter.Name.Replace("(", "[").Replace(")", "]")}'";
                     using ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(_managementScope, query, _enumerationOptions);
+
+                    managementObjectSearcher.Scope.Options.Locale = _scopeOptionsLocale;
                     foreach (ManagementObject managementObject in managementObjectSearcher.Get())
                     {
                         networkAdapter.BytesSentPersec = GetPropertyValue<ulong>(managementObject["BytesSentPersec"]);
@@ -554,7 +580,8 @@ namespace Hardware.Info.Windows
             string queryString = UseAsteriskInWMI ? "SELECT * FROM Win32_Printer"
                                                   : "SELECT Caption, Default, Description, HorizontalResolution, Local, Name, Network, Shared, VerticalResolution FROM Win32_Printer";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
-
+            
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 Printer printer = new Printer
@@ -583,7 +610,8 @@ namespace Hardware.Info.Windows
             string queryString = UseAsteriskInWMI ? "SELECT * FROM Win32_SoundDevice WHERE NOT Manufacturer='Microsoft'"
                                                   : "SELECT Caption, Description, Manufacturer, Name, ProductName FROM Win32_SoundDevice WHERE NOT Manufacturer='Microsoft'";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
-
+            
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 SoundDevice soundDevice = new SoundDevice
@@ -609,6 +637,7 @@ namespace Hardware.Info.Windows
                                                   : "SELECT AdapterCompatibility, AdapterRAM, Caption, CurrentBitsPerPixel, CurrentHorizontalResolution, CurrentNumberOfColors, CurrentRefreshRate, CurrentVerticalResolution, Description, DriverDate, DriverVersion, MaxRefreshRate, MinRefreshRate, Name, VideoModeDescription, VideoProcessor FROM Win32_VideoController";
             using ManagementObjectSearcher mos = new ManagementObjectSearcher(_managementScope, queryString, _enumerationOptions);
 
+            mos.Scope.Options.Locale = _scopeOptionsLocale;
             foreach (ManagementObject mo in mos.Get())
             {
                 VideoController videoController = new VideoController
