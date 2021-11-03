@@ -417,12 +417,16 @@ namespace Hardware.Info.Linux
         public List<Motherboard> GetMotherboardList()
         {
             List<Motherboard> motherboardList = new List<Motherboard>();
-
+            var serialNumber = TryReadFileText("/sys/class/dmi/id/board_serial");
+            if (string.IsNullOrWhiteSpace(serialNumber))
+            {
+                serialNumber = TryReadFileText("/sys/devices/virtual/dmi/id/chassis_asset_tag");
+            }
             Motherboard motherboard = new Motherboard
             {
                 Product = TryReadFileText("/sys/class/dmi/id/board_name"),
                 Manufacturer = TryReadFileText("/sys/class/dmi/id/board_vendor"),
-                SerialNumber = TryReadFileText("/sys/class/dmi/id/board_serial")
+                SerialNumber = serialNumber
             };
 
             motherboardList.Add(motherboard);
