@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Hardware.Info</PackageId>
+    <PackageId>Sms.Hardware.Info</PackageId>
     <Product>Hardware.Info</Product>
     <Version>1.1.1.2</Version>
     <Authors>Jinjinov</Authors>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Management" Version="4.7.0" />
+    <PackageReference Include="System.Management" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
