@@ -1,13 +1,15 @@
 # Hardware.Info
 
-Battery, BIOS, CPU - processor, storage drive, keyboard, RAM - memory, monitor, motherboard, mouse, NIC - network adapter, printer, sound card - audio card, graphics card - video card. Hardware.Info is a .NET Standard 2.0 library and uses WMI on Windows, /dev, /proc, /sys on Linux and sysctl, system_profiler on macOS.
+Battery, BIOS, CPU - processor, storage drive, keyboard, RAM - memory, monitor, motherboard, mouse, NIC - network
+adapter, printer, sound card - audio card, graphics card - video card. Hardware.Info is a .NET Standard 2.0 library and
+uses WMI on Windows, /dev, /proc, /sys on Linux and sysctl, system_profiler on macOS.
 
 ## How to use:
 
-1. Include NuGet package from https://www.nuget.org/packages/Hardware.Info
+1. Include NuGet package from https://www.nuget.org/packages/Sms.Hardware.Info
 
         <ItemGroup>
-            <PackageReference Include="Hardware.Info" Version="1.1.1.1" />
+            <PackageReference Include="Sms.Hardware.Info" Version="1.1.1.2" />
         </ItemGroup>
 
 2. Call `RefreshAll()` or one of the other `Refresh*()` methods:
@@ -123,9 +125,14 @@ Battery, BIOS, CPU - processor, storage drive, keyboard, RAM - memory, monitor, 
 
 ### 21 second delay on first use in Windows
 
-Hardware.Info uses WMI (Windows Management Instrumentation) on Windows OS. For certain queries WMI takes 21 seconds to initialize the first time you use it, after that all subsequent queries will execute immediately. If WMI isn't used for 15 minutes it will have to be initialized again the next time you use it.
+Hardware.Info uses WMI (Windows Management Instrumentation) on Windows OS. For certain queries WMI takes 21 seconds to
+initialize the first time you use it, after that all subsequent queries will execute immediately. If WMI isn't used for
+15 minutes it will have to be initialized again the next time you use it.
 
-The 21 second initialization delay is caused by RPC that WMI uses internally. In RPC [documentation](https://docs.microsoft.com/en-us/windows/win32/services/services-and-rpc-tcp) it says that the RPC/TCP time-out interval is defined with a `SCMApiConnectionParam` registry value located at `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control` and that the default value is set to 21,000 (21 seconds).
+The 21 second initialization delay is caused by RPC that WMI uses internally. In
+RPC [documentation](https://docs.microsoft.com/en-us/windows/win32/services/services-and-rpc-tcp) it says that the
+RPC/TCP time-out interval is defined with a `SCMApiConnectionParam` registry value located
+at `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control` and that the default value is set to 21,000 (21 seconds).
 
 You can avoid the 21 second delay by excluding the queries that cause it (see Settings).
 
@@ -138,8 +145,13 @@ HardwareInfo(bool useAsteriskInWMI = true, TimeSpan? timeoutInWMI = null)
 ```
 
 The construcotr accepts two settings for WMI:
-- `useAsteriskInWMI` causes WMI queries to use `SELECT * FROM` instead of `SELECT` with a list of property names. This is slower, but safer, more compatible with older Windows (XP, Vista, 7, 8) where a certain WMI property might be missing and throw an exception when queried by name. The default value is `true`.
-- `timeoutInWMI` sets the `Timeout` property of the `EnumerationOptions` in the `ManagementObjectSearcher` that executes the query. The default value is `EnumerationOptions.InfiniteTimeout`. Changing this could cause the query to return empty results in certain cases.
+
+- `useAsteriskInWMI` causes WMI queries to use `SELECT * FROM` instead of `SELECT` with a list of property names. This
+  is slower, but safer, more compatible with older Windows (XP, Vista, 7, 8) where a certain WMI property might be
+  missing and throw an exception when queried by name. The default value is `true`.
+- `timeoutInWMI` sets the `Timeout` property of the `EnumerationOptions` in the `ManagementObjectSearcher` that executes
+  the query. The default value is `EnumerationOptions.InfiniteTimeout`. Changing this could cause the query to return
+  empty results in certain cases.
 
 ### Refresh methods settings:
 
@@ -152,6 +164,7 @@ RefreshNetworkAdapterList(bool includeBytesPersec = true, bool includeNetworkAda
 ```
 
 Setting `includePercentProcessorTime` and `includeBytesPersec` to `false` will exclude the queries that:
+
 - cause a 21 second delay the first time they are called in Windows
 - cause a 1 second delay every time they are called in Linux
 
@@ -180,9 +193,15 @@ Setting `includeNetworkAdapterConfiguration` to `false` has only a small impact 
 
 ## Version history:
 
+- 1.1.1.2:
+    - Added en locale for System.Management by default.
+    - Changed method for read motherboard Serial Number without root priveleges.
+
 - 1.1.1.1:
-    - Added `Memory.BankLabel`, `Memory.MinVoltage`, `Memory.MaxVoltage` in Windows - by [@AathifMahir](https://github.com/AathifMahir)
-    - Added `CPU.SocketDesignation`, `CPU.SecondLevelAddressTranslationExtensions` in Windows - by [@AathifMahir](https://github.com/AathifMahir)
+    - Added `Memory.BankLabel`, `Memory.MinVoltage`, `Memory.MaxVoltage` in Windows -
+      by [@AathifMahir](https://github.com/AathifMahir)
+    - Added `CPU.SocketDesignation`, `CPU.SecondLevelAddressTranslationExtensions` in Windows -
+      by [@AathifMahir](https://github.com/AathifMahir)
     - Added Windows version check for WMI properties that require at least Windows 8
     - Added Windows version check for WMI properties that require at least Windows 10
     - Added XML summary for public properties in every class.
@@ -199,7 +218,8 @@ Setting `includeNetworkAdapterConfiguration` to `false` has only a small impact 
 - 1.0.1.0:
     - Added `CpuCore` info in Windows - by [@isenmann](https://github.com/isenmann)
     - Added `CPU.PercentProcessorTime`, `CPU.CpuCoreList` in Windows - by [@isenmann](https://github.com/isenmann)
-    - Added `NetworkAdapter.BytesSentPersec`, `NetworkAdapter.BytesReceivedPersec` in Windows - by [@isenmann](https://github.com/isenmann)
+    - Added `NetworkAdapter.BytesSentPersec`, `NetworkAdapter.BytesReceivedPersec` in Windows -
+      by [@isenmann](https://github.com/isenmann)
 - 1.0.0.1:
     - Added `Battery.EstimatedChargeRemaining` in Windows, Linux - by [@reptail](https://github.com/reptail)
 - 1.0.0.0:
